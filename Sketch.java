@@ -140,7 +140,7 @@ public class Sketch extends PApplet {
     
     // If the mouse is pressed on the balloon, the balloon moves to a random location
     if (mouseX > balloonX && mouseX < balloonX + imgBalloon.width && mouseY > balloonY && mouseY < balloonY + imgBalloon.height) {
-      
+
       balloonX = balloRandom.nextInt(width / 2 - imgBalloon.width) + width / 2 - imgBalloon.width;
       balloonY = balloRandom.nextInt(height - imgBalloon.height);
     }
@@ -148,7 +148,7 @@ public class Sketch extends PApplet {
 
   public void keyPressed() {
 
-    // If the shift key is pressed while the monkey is on the balloon, it moves to a random location
+    // If the shift key is pressed and the monkey is on the balloon, it moves to a random location
     if (keyCode == SHIFT && dartMonkeyX < balloonX + imgBalloon.width &&
         dartMonkeyX + imgDartMonkey.width > balloonX &&
         dartMonkeyY < balloonY + imgBalloon.height &&
