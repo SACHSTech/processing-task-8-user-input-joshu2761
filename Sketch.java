@@ -11,21 +11,21 @@ public class Sketch extends PApplet {
   PImage imgBackground;
 
   // Other variables
-  float balloonX;
-  float balloonY;
-  float dartX;
-  float dartY;
-  float dartMonkeyX;
-  float dartMonkeyY;
-  float dartMonkeySpeedX;
-  float dartMonkeySpeedY;
-  double gravity;
-  float dartSpeed;
-  float dartSpeedX;
-  float dartSpeedY;
-  double dartAngle;
-  boolean isPopped;
-  
+  float fltBalloonX;
+  float fltBalloonY;
+  float fltDartX;
+  float fltDartY;
+  float fltDartMonkeyX;
+  float fltDartMonkeyY;
+  float fltDartMonkeySpeedX;
+  float dblDartMonkeySpeedY;
+  double dblGravity;
+  float fltDartSpeed;
+  float fltDartSpeedX;
+  float fltDartSpeedY;
+  double dblDartAngle;
+  int intBalloonsPopped;
+
   Random balloRandom = new Random();
 
   public void settings() {
@@ -46,13 +46,16 @@ public class Sketch extends PApplet {
     imgBalloon.resize(imgBalloon.width / 8, imgBalloon.height / 8);
 
     // Initialize variables
-    dartMonkeyX = 0;
-    dartMonkeyY = height - imgDartMonkey.height;
-    gravity = 0.2;
-    dartX = dartMonkeyX + imgDartMonkey.width / 2;
-    dartY = dartMonkeyY;
-    balloonX = balloRandom.nextInt(width / 2) + width / 2;
-    balloonY = balloRandom.nextInt(height - imgBalloon.height);
+    fltDartMonkeyX = 0;
+    fltDartMonkeyY = height - imgDartMonkey.height;
+    dblGravity = 0.2;
+    fltDartX = fltDartMonkeyX + imgDartMonkey.width / 2;
+    fltDartY = fltDartMonkeyY;
+    fltBalloonX = balloRandom.nextInt(width / 2) + width / 2;
+    fltBalloonY = balloRandom.nextInt(height - imgBalloon.height);
+
+    // Initialize counters
+    intBalloonsPopped = 0;
   }
 
   public void draw() {
@@ -64,11 +67,11 @@ public class Sketch extends PApplet {
     movement();
 
     // Shooting: Calculate angle and speed
-    dartAngle = Math.atan((double)(mouseY - dartMonkeyY) / (mouseX - dartMonkeyX + imgDartMonkey.width));
-    dartSpeed = (float)(Math.sqrt(Math.pow(mouseX - dartMonkeyX + imgDartMonkey.width, 2) + Math.pow(mouseY - dartMonkeyY, 2)) / 10);
+    dblDartAngle = Math.atan((double)(mouseY - fltDartMonkeyY) / (mouseX - fltDartMonkeyX + imgDartMonkey.width));
+    fltDartSpeed = (float)(Math.sqrt(Math.pow(mouseX - fltDartMonkeyX + imgDartMonkey.width, 2) + Math.pow(mouseY - fltDartMonkeyY, 2)) / 10);
 
     // Draws a line from the dart monkey to the mouse
-    line(dartMonkeyX + imgDartMonkey.width, dartMonkeyY, mouseX, mouseY);
+    line(fltDartMonkeyX + imgDartMonkey.width, fltDartMonkeyY, mouseX, mouseY);
 
     // Shoots dart if mouse is pressed
     if (mousePressed) {
@@ -76,86 +79,115 @@ public class Sketch extends PApplet {
     }
     
     // Draws balloon
-    image(imgBalloon, balloonX, balloonY);
+    image(imgBalloon, fltBalloonX, fltBalloonY);
+
+    // Displays the number of balloons popped and darts used
+    fill(0);
+    textSize(50);
+    text("Balloons popped: " + intBalloonsPopped, 10, 50);
+
+    if (keyPressed && key == 'q' && key == 'r') {
+      setup();
+    }
   }
+
+  /*
+   * Controls the movement of the dart monkey
+   * @author: Joshua Yin
+   * @param: none
+   * @return: void
+   */
 
   public void movement() {
 
     // Left-right movement
     if (keyPressed) {
       if (key == 'd' || keyCode == RIGHT) {
-        dartMonkeySpeedX = 5;
+        fltDartMonkeySpeedX = 5;
       }
       else if (key == 'a' || keyCode == LEFT) {
-        dartMonkeySpeedX = -5;
+        fltDartMonkeySpeedX = -5;
       }
     }
     else {
-      dartMonkeySpeedX = 0;
+      fltDartMonkeySpeedX = 0;
     }
 
     // If the monkey is not on the ground, it falls
-    if (dartMonkeyY < height - imgDartMonkey.height) {
-      dartMonkeySpeedY += gravity;
+    if (fltDartMonkeyY < height - imgDartMonkey.height) {
+      dblDartMonkeySpeedY += dblGravity;
     }
     // Jumping
     else if ((keyPressed && key == 'w') || (keyPressed && key == ' ') || (keyPressed && keyCode == UP)) {
-        dartMonkeySpeedY = -5;
+        dblDartMonkeySpeedY = -5;
     }
     // If the monkey is on the ground, then it stops falling
     else {
-      dartMonkeySpeedY = 0;
+      dblDartMonkeySpeedY = 0;
     }
-    dartMonkeyX += dartMonkeySpeedX;
-    dartMonkeyY += dartMonkeySpeedY;
+    fltDartMonkeyX += fltDartMonkeySpeedX;
+    fltDartMonkeyY += dblDartMonkeySpeedY;
 
     // Collision, prevents the monkey from going off the screen
-    if (dartMonkeyX < 0) {
-      dartMonkeyX = 0;
+    if (fltDartMonkeyX < 0) {
+      fltDartMonkeyX = 0;
     }
-    else if (dartMonkeyX > width - imgDartMonkey.width) {
-      dartMonkeyX = width - imgDartMonkey.width;
+    else if (fltDartMonkeyX > width - imgDartMonkey.width) {
+      fltDartMonkeyX = width - imgDartMonkey.width;
     }
 
-    image(imgDartMonkey, dartMonkeyX, dartMonkeyY);
+    image(imgDartMonkey, fltDartMonkeyX, fltDartMonkeyY);
   }
 
   public void shoot() {
 
     // Shooting: Calculate angle and speed
-    dartSpeedX = (float)(dartSpeed * Math.cos(dartAngle));
-    dartSpeedY = (float)(dartSpeed * Math.sin(dartAngle));
-    dartX += dartSpeedX;
-    dartY += dartSpeedY;
-    image(imgDart, dartX, dartY);
+    fltDartSpeedX = (float)(fltDartSpeed * Math.cos(dblDartAngle));
+    fltDartSpeedY = (float)(fltDartSpeed * Math.sin(dblDartAngle));
+    fltDartX += fltDartSpeedX;
+    fltDartY += fltDartSpeedY;
+    image(imgDart, fltDartX, fltDartY);
 
     // If the dart goes off screen, the position resets
-    if (dartX > width || dartY > height) {
-      dartX = dartMonkeyX + imgDartMonkey.width;
-      dartY = dartMonkeyY;
+    if (fltDartX > width || fltDartY > height) {
+      fltDartX = fltDartMonkeyX + imgDartMonkey.width;
+      fltDartY = fltDartMonkeyY;
     }
   }
 
+  /*
+   * If the mouse is pressed on the balloon, the balloon moves to a random location
+   * @author: Joshua Yin
+   * @param: none
+   * @return: void
+   */
   public void mousePressed() {
     
     // If the mouse is pressed on the balloon, the balloon moves to a random location
-    if (mouseX > balloonX && mouseX < balloonX + imgBalloon.width && mouseY > balloonY && mouseY < balloonY + imgBalloon.height) {
+    if (mouseX > fltBalloonX && mouseX < fltBalloonX + imgBalloon.width && mouseY > fltBalloonY && mouseY < fltBalloonY + imgBalloon.height) {
 
-      balloonX = balloRandom.nextInt(width / 2 - imgBalloon.width) + width / 2 - imgBalloon.width;
-      balloonY = balloRandom.nextInt(height - imgBalloon.height);
+      fltBalloonX = balloRandom.nextInt(width / 2 - imgBalloon.width) + width / 2 - imgBalloon.width;
+      fltBalloonY = balloRandom.nextInt(height - imgBalloon.height);
+      intBalloonsPopped++;
     }
   }
 
+  /*
+   * If the shift key is pressed and the monkey is on the balloon, it moves to a random location
+   * @author: Joshua Yin
+   * @param: keyCode, the key that is pressed
+   * @return: void
+   */
   public void keyPressed() {
 
     // If the shift key is pressed and the monkey is on the balloon, it moves to a random location
-    if (keyCode == SHIFT && dartMonkeyX < balloonX + imgBalloon.width &&
-        dartMonkeyX + imgDartMonkey.width > balloonX &&
-        dartMonkeyY < balloonY + imgBalloon.height &&
-        dartMonkeyY + imgDartMonkey.height > balloonY) {
+    if (keyCode == SHIFT && fltDartMonkeyX < fltBalloonX + imgBalloon.width &&
+        fltDartMonkeyX + imgDartMonkey.width > fltBalloonX &&
+        fltDartMonkeyY < fltBalloonY + imgBalloon.height &&
+        fltDartMonkeyY + imgDartMonkey.height > fltBalloonY) {
 
-      balloonX = balloRandom.nextInt(width / 2 - imgBalloon.width) + width / 2 - imgBalloon.width;
-      balloonY = balloRandom.nextInt(height - imgBalloon.height);
+      fltBalloonX = balloRandom.nextInt(width / 2 - imgBalloon.width) + width / 2 - imgBalloon.width;
+      fltBalloonY = balloRandom.nextInt(height - imgBalloon.height);
     }
   }
-}
+} 
